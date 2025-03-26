@@ -88,3 +88,10 @@ PEAK_VALUES = {
 LOW_DEMAND_START = "16:15"
 LOW_DEMAND_END = "22:00"
 LOW_DEMAND_RANGE = (15000, 21000)
+
+MAX_DEMAND_LIMITS = {
+    "Peak": 23358,              # 尖峰時段
+    "Half_Peak": 31943,         # 半尖峰時段
+    "Saturday_Half_Peak": 28440, # 週六半尖峰時段
+    "Off_Peak": 31084           # 離峰時段
+}
