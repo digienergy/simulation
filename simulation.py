@@ -58,24 +58,25 @@ def generate_random_demand(period, peak_value, is_low_demand=False):
         # 根據時段調整範圍
         if period == "Peak":
             # 尖峰時段：接近 peak_value，但不超過時段限制
-            lower_bound = min(BASE_DEMAND_RANGE[0] * 0.9, peak_value, max_demand_limit)
+            lower_bound = min(BASE_DEMAND_RANGE[0], peak_value, max_demand_limit)
             upper_bound = min(BASE_DEMAND_RANGE[1], peak_value, max_demand_limit)
         elif period == "Half_Peak":
             # 半尖峰時段：中等範圍
-            lower_bound = min(BASE_DEMAND_RANGE[0] * 0.7, peak_value, max_demand_limit)
-            upper_bound = min(BASE_DEMAND_RANGE[1] * 0.9, peak_value, max_demand_limit)
+            lower_bound = min(BASE_DEMAND_RANGE[0], peak_value, max_demand_limit)
+            upper_bound = min(BASE_DEMAND_RANGE[1], peak_value, max_demand_limit)
         elif period == "Saturday_Half_Peak":
             # 週六半尖峰：略低於半尖峰
-            lower_bound = min(BASE_DEMAND_RANGE[0] * 0.6, peak_value, max_demand_limit)
-            upper_bound = min(BASE_DEMAND_RANGE[1] * 0.8, peak_value, max_demand_limit)
+            lower_bound = min(BASE_DEMAND_RANGE[0], peak_value, max_demand_limit)
+            upper_bound = min(BASE_DEMAND_RANGE[1], peak_value, max_demand_limit)
         else:  # Off_Peak
-            # 離峰時段：最低範圍
-            lower_bound = min(BASE_DEMAND_RANGE[0] * 0.5, peak_value, max_demand_limit)
-            upper_bound = min(BASE_DEMAND_RANGE[1] * 0.7, peak_value, max_demand_limit)
+            # 離峰時段：降低範圍
+            lower_bound = min(BASE_DEMAND_RANGE[0], peak_value, max_demand_limit)  # 降低下限
+            upper_bound = min(BASE_DEMAND_RANGE[1], peak_value, max_demand_limit)  # 降低上限
 
     # 確保下限不超過上限
     lower_bound = min(lower_bound, upper_bound)
     demand = random.uniform(lower_bound, upper_bound)
+
     return round(demand)
 
 def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, peak_time=None, peak_value=None):
