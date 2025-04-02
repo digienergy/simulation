@@ -22,20 +22,34 @@ MONTHS = config["MONTHS"]
 SEASONAL_ADJUSTMENT = config["SEASONAL_ADJUSTMENT"]
 BASIC_CHARGE_RATES = config["BASIC_CHARGE_RATES"]
 ENERGY_RATES = config["ENERGY_RATES"]
-PEAK_VALUES = config["PEAK_VALUES"]
-MAX_DEMAND_LIMITS = config["MAX_DEMAND_LIMITS"]
 
 LOW_DEMAND_START = config["LOW_DEMAND_START"]
 LOW_DEMAND_END = config["LOW_DEMAND_END"]
 LOW_DEMAND_RANGE = config["LOW_DEMAND_RANGE"]
 
-REFERENCE_TOTAL_DEMANDS = config["REFERENCE_TOTAL_DEMANDS"]
+PEAK_VALUES_DICT = {
+    4: config["PEAK_VALUES_APRIL"],
+    5: config["PEAK_VALUES_MAY"],
+    7: config["PEAK_VALUES_JULY"]
+}
+
+REFERENCE_TOTAL_DEMANDS_DICT = {
+    4: config["REFERENCE_TOTAL_DEMANDS_APRIL"],
+    5: config["REFERENCE_TOTAL_DEMANDS_MAY"],
+    7: config["REFERENCE_TOTAL_DEMANDS_JULY"]
+}
+
+MAX_DEMAND_LIMITS_DICT = {
+    4: config["MAX_DEMAND_LIMITS_APRIL"],
+    5: config["MAX_DEMAND_LIMITS_MAY"],
+    7: config["MAX_DEMAND_LIMITS_JULY"]
+}
 
 def time_to_minutes(time_str):
     hour, minute = map(int, time_str.split(":"))
     return hour * 60 + minute
 
-def generate_random_demand(period, peak_value, is_low_demand=False):
+def generate_random_demand(period, peak_value, max_demand_limits, is_low_demand=False):
     """
     根據時段生成隨機需求量，確保不超過 peak_value 和時段最高需量限制。
 
@@ -48,7 +62,7 @@ def generate_random_demand(period, peak_value, is_low_demand=False):
         float: 隨機生成的需求量 (kW)
     """
     # 獲取時段的最高需量限制（從 config.txt 讀取）
-    max_demand_limit = MAX_DEMAND_LIMITS[period]
+    max_demand_limit = max_demand_limits[period]
 
     # 根據時段設置隨機範圍
     if is_low_demand:
@@ -160,6 +174,7 @@ def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, pe
         tuple: (list: 調整後的需量數據, dict: 調整後的各時段最大需量和總需量/總能量)
     """
     # Initialize totals and maximums
+    max_demand_limits = MAX_DEMAND_LIMITS_DICT[month]
     total_peak_demand = 0
     total_off_peak_demand = 0
     total_half_peak_demand = 0
@@ -221,7 +236,7 @@ def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, pe
                     period = "Off_Peak"
 
                 # Generate demand based on period
-                demand = generate_random_demand(period, peak_value, is_low_demand)
+                demand = generate_random_demand(period, peak_value, max_demand_limits, is_low_demand)
 
                 # Calculate energy (kWh) for this 15-minute interval
                 energy_kWh = demand * (15 / 60)  # 15 minutes = 0.25 hours
@@ -633,11 +648,6 @@ def read_and_count_periods(filename):
             period = row["period"]
             period_counts[period] += 1
 
-    # 列印統計結果
-    print("各時段數據點數量：")
-    for period, count in period_counts.items():
-        print(f"  {period}: {count} 個數據點")
-
     return all_data, period_counts
 
 def adjust_demand(all_data, period_counts, differences, max_demand_limits):
@@ -807,51 +817,44 @@ def calculate_monthly_stats_from_csv(filename, year, month):
 
 # 主程序
 def main():
+    # 處理 4 月、5 月和 7 月
+    for month in [4, 5, 7]:
+        PEAK_VALUES = PEAK_VALUES_DICT[month]
+        REFERENCE_TOTAL_DEMANDS = REFERENCE_TOTAL_DEMANDS_DICT[month]
 
-    # 遍歷 PEAK_VALUES 中的所有日期
-    for time, value in PEAK_VALUES.items():
-        dt = datetime.strptime(time, "%Y-%m-%d %H:%M")
-        year = dt.year
-        month = dt.month
-        day = dt.day
-        hour = dt.hour
-        minute = dt.minute
-        peak_time = f"{hour:02d}:{minute:02d}"
+        # 遍歷該月的 PEAK_VALUES
+        for time, value in PEAK_VALUES.items():
+            dt = datetime.strptime(time, "%Y-%m-%d %H:%M")
+            year = dt.year
+            month = dt.month
+            day = dt.day
+            hour = dt.hour
+            minute = dt.minute
+            peak_time = f"{hour:02d}:{minute:02d}"
 
-        # 生成單日數據
-        single_day_data = generate_daily_demand_data(
-            year=year, 
-            month=month, 
-            start_day=day, 
-            end_day=day,
-            peak_time=peak_time,
-            peak_value=value
-        )
+            # 生成整個月數據
+            days_in_month = MONTHS.get(month, 31)
+            all_month_data = generate_daily_demand_data(
+                year=year,
+                month=month,
+                start_day=1,
+                end_day=days_in_month,
+                peak_time=peak_time,
+                peak_value=value
+            )
 
+            filename = f"factory_demand_data{year}_{month}.csv"
+            write_to_csv(filename, all_month_data)
 
-        # # 計算基本電費（契約容量為 38000 kW）
-        # contract_capacity = 38000
-        # basic_charge = calculate_basic_charge(contract_capacity, year=2024, month=4, day=12)
-        # energy_charge = calculate_energy_charge(single_day_data, year, month, day)
-        # print(f"Basic Charge  ({year}-{month:02d}-{day:02d}): {basic_charge} NTD")
-        # print(f"Energy Charge ({year}-{month:02d}-{day:02d}): {energy_charge} NTD")
-        # total_charge = basic_charge + energy_charge
-        # print(f"Total Charge  ({year}-{month:02d}-{day:02d}): {total_charge} NTD")
+        print(f"數據已保存到 {filename}")
 
-        # 將數據保存到 CSV 檔案
-        filename = f"factory_demand_data{year}_{month}.csv"  # 修正檔案名稱格式
-        write_to_csv(filename, single_day_data)
+        monthly_stats = calculate_monthly_stats_from_csv(filename, year, month)
+        differences = compare_energy_with_reference(monthly_stats, REFERENCE_TOTAL_DEMANDS, year, month)
+        max_demand_limits = MAX_DEMAND_LIMITS_DICT[month]
+        adjust_demand_from_csv(filename, differences, max_demand_limits, PEAK_VALUES)
+        monthly_stats = calculate_monthly_stats_from_csv(filename, year, month)
+        differences = compare_energy_with_reference(monthly_stats, REFERENCE_TOTAL_DEMANDS, year, month)
+        plot_demand_data(filename, year, month)
 
-
-    print(f"數據已保存到 {filename}")
-
-    # # 比較用電度數與參考值，計算差值
-    monthly_stats = calculate_monthly_stats_from_csv(filename, year, month)
-    differences = compare_energy_with_reference(monthly_stats, REFERENCE_TOTAL_DEMANDS,year, month)
-    adjust_demand_from_csv(filename, differences, MAX_DEMAND_LIMITS, PEAK_VALUES)
-    monthly_stats = calculate_monthly_stats_from_csv(filename, year, month)
-    differences = compare_energy_with_reference(monthly_stats, REFERENCE_TOTAL_DEMANDS,year, month)
-    plot_demand_data(filename, 2024, 7)
-    
 if __name__ == "__main__":
     main()
