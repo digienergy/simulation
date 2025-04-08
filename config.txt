@@ -52,36 +52,36 @@ ENERGY_RATES = {
 }
 
 PEAK_VALUES_APRIL = {
-    "2024-04-01 14:30": 25190,
-    "2024-04-02 09:15": 27244,
-    "2024-04-03 17:00": 30385,
-    "2024-04-04 12:45": 31861,
-    "2024-04-05 08:30": 24623,
-    "2024-04-06 19:00": 23143,
-    "2024-04-07 15:15": 18279,
-    "2024-04-08 22:00": 32716,
-    "2024-04-09 11:30": 30145,
-    "2024-04-10 07:45": 29337,
-    "2024-04-11 16:00": 29222,
-    "2024-04-12 13:15": 29164,
-    "2024-04-13 20:30": 24324,
-    "2024-04-14 10:00": 19276,
-    "2024-04-15 18:45": 31507,
-    "2024-04-16 14:00": 29126,
+    "2024-04-01 22:30": 25190,
+    "2024-04-02 21:00": 27244,
+    "2024-04-03 20:30": 30385,
+    "2024-04-04 15:30": 31851,
+    "2024-04-05 18:15": 24623,
+    "2024-04-06 17:00": 23143,
+    "2024-04-07 18:15": 18279,
+    "2024-04-08 18:30": 32716,
+    "2024-04-09 17:15": 30145,
+    "2024-04-10 20:30": 29337,
+    "2024-04-11 21:00": 29222,
+    "2024-04-12 19:45": 29164,
+    "2024-04-13 10:30": 24324,
+    "2024-04-14 00:00": 19276,
+    "2024-04-15 22:30": 31507,
+    "2024-04-16 21:00": 29126,
     "2024-04-17 09:30": 26875,
-    "2024-04-18 21:15": 29398,
-    "2024-04-19 12:00": 32131,
-    "2024-04-20 08:15": 30136,
-    "2024-04-21 17:30": 23238,
-    "2024-04-22 11:00": 28936,
-    "2024-04-23 19:45": 32529,
-    "2024-04-24 15:00": 28300,
-    "2024-04-25 10:15": 32438,
-    "2024-04-26 16:30": 32937,
+    "2024-04-18 17:30": 29398,
+    "2024-04-19 20:15": 32131,
+    "2024-04-20 09:00": 30136,
+    "2024-04-21 00:00": 23238,
+    "2024-04-22 20:15": 28396,
+    "2024-04-23 14:00": 32529,
+    "2024-04-24 17:45": 28300,
+    "2024-04-25 14:15": 32438,
+    "2024-04-26 15:30": 32937,
     "2024-04-27 13:45": 25910,
-    "2024-04-28 20:00": 18816,
-    "2024-04-29 14:15": 27302,
-    "2024-04-30 09:00": 27919,
+    "2024-04-28 23:45": 18816,
+    "2024-04-29 18:45": 27302,
+    "2024-04-30 15:00": 27919,
 }
 
 # 5 月 PEAK_VALUES (1-15 日非夏季，16-31 日夏季)
@@ -156,6 +156,30 @@ LOW_DEMAND_START = "16:15"
 LOW_DEMAND_END = "22:00"
 LOW_DEMAND_RANGE = (15000, 21000) #(kW)
 
+# 1 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_JANUARY = {
+    "Peak": 0,
+    "Half_Peak": 31296,
+    "Saturday_Half_Peak": 27576,
+    "Off_Peak": 30509,
+}
+
+# 2 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_FEBRUARY = {
+    "Peak": 0,
+    "Half_Peak": 32552,
+    "Saturday_Half_Peak": 31158,
+    "Off_Peak": 33485,
+}
+
+# 3 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_MARCH = {
+    "Peak": 0,
+    "Half_Peak": 32391,
+    "Saturday_Half_Peak": 32502,
+    "Off_Peak": 34545,
+}
+
 # 4 月最大需量限制 (kW)
 MAX_DEMAND_LIMITS_APRIL = {
     "Peak": 0,              # 尖峰時段 (kW)
@@ -172,12 +196,84 @@ MAX_DEMAND_LIMITS_MAY = {
     "Off_Peak": 31371       # 離峰時段 (kW)
 }
 
+# 6 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_JUNE = {
+    "Peak": 21753,
+    "Half_Peak": 33408,
+    "Saturday_Half_Peak": 29692,
+    "Off_Peak": 31486,
+}
+
 # 7 月最大需量限制 (kW)
 MAX_DEMAND_LIMITS_JULY = {
     "Peak": 23368,          # 尖峰時段 (kW)
     "Half_Peak": 31943,     # 半尖峰時段 (kW)
     "Saturday_Half_Peak": 28440, # 週六半尖峰時段 (kW)
     "Off_Peak": 31084       # 離峰時段 (kW)
+}
+
+# 8 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_AUGUST = {
+    "Peak": 23579,
+    "Half_Peak": 35078,
+    "Saturday_Half_Peak": 24897,
+    "Off_Peak": 33408,
+}
+
+# 9 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_SEPTEMBER = {
+    "Peak": 26928,
+    "Half_Peak": 30201,
+    "Saturday_Half_Peak": 28037,
+    "Off_Peak": 28761,
+}
+
+# 10 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_OCTOBER = {
+    "Peak": 26646,
+    "Half_Peak": 32640,
+    "Saturday_Half_Peak": 24836,
+    "Off_Peak": 30067,
+}
+
+# 11 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_NOVEMBER = {
+    "Peak": 0,
+    "Half_Peak": 31762,
+    "Saturday_Half_Peak": 30561,
+    "Off_Peak": 30494,
+}
+
+# 12 月最大需量限制 (kW)
+MAX_DEMAND_LIMITS_DECEMBER = {
+    "Peak": 0,
+    "Half_Peak": 29760,
+    "Saturday_Half_Peak": 32685,
+    "Off_Peak": 31276,
+}
+
+# 1 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_JANUARY = {
+    "Peak": 0,
+    "Half_Peak": 7136160,
+    "Saturday_Half_Peak": 1129680,
+    "Off_Peak": 6364320,
+}
+
+# 2 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_FEBRUARY = {
+    "Peak": 0,
+    "Half_Peak": 5165280,
+    "Saturday_Half_Peak": 862560,
+    "Off_Peak": 6303840,
+}
+
+# 3 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_MARCH = {
+    "Peak": 0,
+    "Half_Peak": 6957360,
+    "Saturday_Half_Peak": 1488480,
+    "Off_Peak": 6247920,
 }
 
 # 4 月參考總需量 (kWh)
@@ -196,10 +292,58 @@ REFERENCE_TOTAL_DEMANDS_MAY = {
     "Off_Peak": 7430160,
 }
 
+# 6 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_JUNE = {
+    "Peak": 1905600,
+    "Half_Peak": 3720720,
+    "Saturday_Half_Peak": 1471440,
+    "Off_Peak": 7383120,
+}
+
 # 7 月參考總需量 (kWh)
 REFERENCE_TOTAL_DEMANDS_JULY = {
     "Peak": 2254080,
     "Half_Peak": 4437120,
     "Saturday_Half_Peak": 1199280,
     "Off_Peak": 6890160,
+}
+
+# 8 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_AUGUST = {
+    "Peak": 2216640,
+    "Half_Peak": 4170240,
+    "Saturday_Half_Peak": 1445760,
+    "Off_Peak": 6819360,
+}
+
+# 9 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_SEPTEMBER = {
+    "Peak": 2050080,
+    "Half_Peak": 3645600,
+    "Saturday_Half_Peak": 1170000,
+    "Off_Peak": 6906480,
+}
+
+# 10 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_OCTOBER = {
+    "Peak": 900240,
+    "Half_Peak": 5354160,
+    "Saturday_Half_Peak": 1158720,
+    "Off_Peak": 6897840,
+}
+
+# 11 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_NOVEMBER = {
+    "Peak": 0,
+    "Half_Peak": 6454560,
+    "Saturday_Half_Peak": 1521840,
+    "Off_Peak": 6602400,
+}
+
+# 12 月參考總需量 (kWh)
+REFERENCE_TOTAL_DEMANDS_DECEMBER = {
+    "Peak": 0,
+    "Half_Peak": 6694560,
+    "Saturday_Half_Peak": 1404960,
+    "Off_Peak": 6362400,
 }

@@ -34,22 +34,40 @@ PEAK_VALUES_DICT = {
 }
 
 REFERENCE_TOTAL_DEMANDS_DICT = {
+    1: config["REFERENCE_TOTAL_DEMANDS_JANUARY"],
+    2: config["REFERENCE_TOTAL_DEMANDS_FEBRUARY"],
+    3: config["REFERENCE_TOTAL_DEMANDS_MARCH"],
     4: config["REFERENCE_TOTAL_DEMANDS_APRIL"],
     5: config["REFERENCE_TOTAL_DEMANDS_MAY"],
-    7: config["REFERENCE_TOTAL_DEMANDS_JULY"]
+    6: config["REFERENCE_TOTAL_DEMANDS_JUNE"],
+    7: config["REFERENCE_TOTAL_DEMANDS_JULY"],
+    8: config["REFERENCE_TOTAL_DEMANDS_AUGUST"],
+    9: config["REFERENCE_TOTAL_DEMANDS_SEPTEMBER"],
+    10: config["REFERENCE_TOTAL_DEMANDS_OCTOBER"],
+    11: config["REFERENCE_TOTAL_DEMANDS_NOVEMBER"],
+    12: config["REFERENCE_TOTAL_DEMANDS_DECEMBER"],
 }
 
 MAX_DEMAND_LIMITS_DICT = {
+    1: config["MAX_DEMAND_LIMITS_JANUARY"],
+    2: config["MAX_DEMAND_LIMITS_FEBRUARY"],
+    3: config["MAX_DEMAND_LIMITS_MARCH"],
     4: config["MAX_DEMAND_LIMITS_APRIL"],
     5: config["MAX_DEMAND_LIMITS_MAY"],
-    7: config["MAX_DEMAND_LIMITS_JULY"]
+    6: config["MAX_DEMAND_LIMITS_JUNE"],
+    7: config["MAX_DEMAND_LIMITS_JULY"],
+    8: config["MAX_DEMAND_LIMITS_AUGUST"],
+    9: config["MAX_DEMAND_LIMITS_SEPTEMBER"],
+    10: config["MAX_DEMAND_LIMITS_OCTOBER"],
+    11: config["MAX_DEMAND_LIMITS_NOVEMBER"],
+    12: config["MAX_DEMAND_LIMITS_DECEMBER"],
 }
 
 def time_to_minutes(time_str):
     hour, minute = map(int, time_str.split(":"))
     return hour * 60 + minute
 
-def generate_random_demand(period, peak_value, max_demand_limits, is_low_demand=False):
+def generate_random_demand(period, max_demand_limits, peak_value,is_low_demand=False):
     """
     根據時段生成隨機需求量，確保不超過 peak_value 和時段最高需量限制。
 
@@ -63,6 +81,9 @@ def generate_random_demand(period, peak_value, max_demand_limits, is_low_demand=
     """
     # 獲取時段的最高需量限制（從 config.txt 讀取）
     max_demand_limit = max_demand_limits[period]
+
+    if peak_value == None :
+       peak_value = BASE_DEMAND_RANGE[0]*1.5
 
     # 根據時段設置隨機範圍
     if is_low_demand:
@@ -213,7 +234,7 @@ def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, pe
                 time_minutes = time_to_minutes(record_time)
                 is_low_demand = LOW_DEMAND_START <= record_time <= LOW_DEMAND_END
 
-                # Classify the period based on the new table
+                # 時段分類
                 if day_type == "Weekday":
                     if season == "Summer":
                         if 16 * 60 <= time_minutes < 22 * 60:  # 16:00-22:00
@@ -223,25 +244,31 @@ def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, pe
                         else:  # 00:00-09:00
                             period = "Off_Peak"
                     else:  # Non-Summer
-                        if 9 * 60 <= time_minutes < 24 * 60:  # 09:00-24:00
+                        if (6 * 60 <= time_minutes < 11 * 60) or (14 * 60 <= time_minutes < 24 * 60):  # 06:00-11:00, 14:00-24:00
                             period = "Half_Peak"
-                        else:  # 00:00-09:00
+                        else:  # 00:00-06:00, 11:00-14:00
                             period = "Off_Peak"
                 elif day_type == "Saturday":
-                    if 9 * 60 <= time_minutes < 24 * 60:  # 09:00-24:00
-                        period = "Saturday_Half_Peak"
-                    else:  # 00:00-09:00
-                        period = "Off_Peak"
+                    if season == "Summer":
+                        if 9 * 60 <= time_minutes < 24 * 60:  # 09:00-24:00
+                            period = "Saturday_Half_Peak"
+                        else:  # 00:00-09:00
+                            period = "Off_Peak"
+                    else:  # Non-Summer
+                        if (6 * 60 <= time_minutes < 11 * 60) or (14 * 60 <= time_minutes < 24 * 60):  # 06:00-11:00, 14:00-24:00
+                            period = "Saturday_Half_Peak"
+                        else:  # 00:00-06:00, 11:00-14:00
+                            period = "Off_Peak"
                 else:  # Sunday
                     period = "Off_Peak"
 
-                # Generate demand based on period
-                demand = generate_random_demand(period, peak_value, max_demand_limits, is_low_demand)
+                    # 生成需求數據
+                demand = generate_random_demand(period, max_demand_limits,peak_value, is_low_demand)
 
-                # Calculate energy (kWh) for this 15-minute interval
-                energy_kWh = demand * (15 / 60)  # 15 minutes = 0.25 hours
+                # 計算能量 (kWh)
+                energy_kWh = demand * (15 / 60)  # 15 分鐘 = 0.25 小時
 
-                # Update statistics based on period
+                # 更新統計數據
                 if period == "Peak":
                     total_peak_demand += demand
                     total_peak_energy += energy_kWh
@@ -265,7 +292,7 @@ def generate_daily_demand_data(year=2024, month=4, start_day=1, end_day=None, pe
                     "weekday": weekday,
                     "time": record_time,
                     "demand_kW": demand,
-                    "period": period  # Add period to the data for reference
+                    "period": period
                 }
                 data.append(entry)
 
@@ -447,10 +474,10 @@ def plot_demand_data(filename, year=2024, month=4):
 
         # 定義時段顏色對應
         period_color_mapping = {
-            "Peak": "orange",
-            "Half_Peak": "green",
-            "Saturday_Half_Peak": "yellow",
-            "Off_Peak": "pink"
+            "Peak": "red",
+            "Half_Peak": "orange",
+            "Saturday_Half_Peak": "blue",
+            "Off_Peak": "green"
         }
 
         # 動態填充時段背景，確保連續性
@@ -818,35 +845,52 @@ def calculate_monthly_stats_from_csv(filename, year, month):
 # 主程序
 def main():
     # 處理 4 月、5 月和 7 月
-    for month in [4, 5, 7]:
-        PEAK_VALUES = PEAK_VALUES_DICT[month]
+    for month in range(1, 13):  # 1 月到 12 月
+        PEAK_VALUES = PEAK_VALUES_DICT.get(month, {})  # 如果沒有 PEAK_VALUES，設為空字典
+        max_demand_limits = MAX_DEMAND_LIMITS_DICT[month]  # 所有月份都有 max_demand_limits
         REFERENCE_TOTAL_DEMANDS = REFERENCE_TOTAL_DEMANDS_DICT[month]
 
-        # 遍歷該月的 PEAK_VALUES
-        for time, value in PEAK_VALUES.items():
-            dt = datetime.strptime(time, "%Y-%m-%d %H:%M")
-            year = dt.year
-            month = dt.month
-            day = dt.day
-            hour = dt.hour
-            minute = dt.minute
-            peak_time = f"{hour:02d}:{minute:02d}"
+        # 遍歷該月的 PEAK_VALUES（如果有）
+        if PEAK_VALUES:
+            for time, value in PEAK_VALUES.items():
+                dt = datetime.strptime(time, "%Y-%m-%d %H:%M")
+                year = dt.year
+                month = dt.month
+                day = dt.day
+                hour = dt.hour
+                minute = dt.minute
+                peak_time = f"{hour:02d}:{minute:02d}"
 
-            # 生成整個月數據
+                # 生成整個月數據
+                days_in_month = MONTHS.get(month, 31)
+                all_month_data = generate_daily_demand_data(
+                    year=year,
+                    month=month,
+                    start_day=1,
+                    end_day=days_in_month,
+                    peak_time=peak_time,
+                    peak_value=value
+                )
+
+                filename = f"factory_demand_data{year}_{month}.csv"
+                write_to_csv(filename, all_month_data)
+        else:
+            # 沒有 PEAK_VALUES 時，生成數據（不指定 peak_time 和 peak_value）
+            year = 2024  # 假設年份為 2024
             days_in_month = MONTHS.get(month, 31)
             all_month_data = generate_daily_demand_data(
                 year=year,
                 month=month,
                 start_day=1,
                 end_day=days_in_month,
-                peak_time=peak_time,
-                peak_value=value
+                peak_time=None,
+                peak_value=None
             )
 
             filename = f"factory_demand_data{year}_{month}.csv"
             write_to_csv(filename, all_month_data)
 
-        print(f"數據已保存到 {filename}")
+        print(f"初始數據已保存到 {filename}")
 
         monthly_stats = calculate_monthly_stats_from_csv(filename, year, month)
         differences = compare_energy_with_reference(monthly_stats, REFERENCE_TOTAL_DEMANDS, year, month)
